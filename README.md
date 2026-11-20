@@ -141,3 +141,26 @@ npx wrangler pages dev dist --compatibility-date=2025-01-01
 
 免费集数：99,399 集中 15,654 集（15.7%）带 mp4，其余为原站付费集，复刻版保持同样的付费墙。
 批量刷新签名：`python tools/refresh_urls.py`（可选，端点已能按需重签）。
+
+## 站点配置（换名字 / 换下载地址 / 换付费墙文案）
+
+改 `site/config.js` 一处即可，全站生效：
+
+```js
+window.DBX = {
+  appName: "DramaBox Ilimitado",          // 全站文本里的 DramaBox 都会替换成它
+  downloadUrl: "https://.../app.apk",     // 所有「Descargar / Desbloquear」按钮都跳这里
+  banner:  { text: "...", cta: "Descargar" },
+  paywall: { title: "...", body: "...", cta: "...", secondary: "..." }
+};
+```
+
+改完 `npm run build` 重新构建（页面 HTML 不用动，配置是运行时读取的）。
+
+## 自动跟随官网更新
+
+`tools/sync.py`：重抓列表 → 找出新增剧集 → 抓详情页和播放页 → 重打包 → 重生成页面。
+
+- 手动：`python tools/sync.py`（本机需要代理时 `set DB_PROXY=http://127.0.0.1:7890`）
+- 自动：`.github/workflows/sync.yml` 每天 UTC 03:00 跑一次，有变化就 commit + push，
+  Cloudflare Pages 收到 push 自动重建。也可以在 Actions 页面手动点 Run workflow。

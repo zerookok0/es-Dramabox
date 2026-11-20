@@ -7,7 +7,7 @@ import urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "raw")
 DATA = os.path.join(ROOT, "data")
-PROXY = os.environ.get("DB_PROXY", "http://127.0.0.1:7890")
+PROXY = os.environ.get("DB_PROXY", "")  # 留空=直连（GitHub Actions / 海外机器）；本机需要代理时设 DB_PROXY
 UA = ("Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36")
 BASE = "https://www.dramabox.com"
@@ -20,10 +20,10 @@ ctx.verify_mode = ssl.CERT_NONE
 
 
 def make_opener():
-    o = urllib.request.build_opener(
-        urllib.request.ProxyHandler({"http": PROXY, "https": PROXY}),
-        urllib.request.HTTPSHandler(context=ctx),
-    )
+    handlers = [urllib.request.HTTPSHandler(context=ctx)]
+    if PROXY:
+        handlers.insert(0, urllib.request.ProxyHandler({"http": PROXY, "https": PROXY}))
+    o = urllib.request.build_opener(*handlers)
     o.addheaders = [
         ("User-Agent", UA),
         ("Accept", "text/html,application/xhtml+xml,*/*;q=0.8"),

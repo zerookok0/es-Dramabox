@@ -8,16 +8,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "raw")
 SITE = os.path.join(ROOT, "site")
 STATIC = os.path.join(SITE, "static")
-PROXY = os.environ.get("DB_PROXY", "http://127.0.0.1:7890")
+PROXY = os.environ.get("DB_PROXY", "")
 UA = ("Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36")
 
 ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
-OP = urllib.request.build_opener(
-    urllib.request.ProxyHandler({"http": PROXY, "https": PROXY}),
-    urllib.request.HTTPSHandler(context=ctx))
+_handlers = [urllib.request.HTTPSHandler(context=ctx)]
+if PROXY:
+    _handlers.insert(0, urllib.request.ProxyHandler({"http": PROXY, "https": PROXY}))
+OP = urllib.request.build_opener(*_handlers)
 OP.addheaders = [("User-Agent", UA), ("Accept-Language", "es-ES,es;q=0.9"), ("Referer", "https://www.dramabox.com/es")]
 
 

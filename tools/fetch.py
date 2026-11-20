@@ -6,17 +6,17 @@ import urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "raw")
-PROXY = os.environ.get("DB_PROXY", "http://127.0.0.1:7890")
+PROXY = os.environ.get("DB_PROXY", "")
 UA = ("Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36")
 
 ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
-opener = urllib.request.build_opener(
-    urllib.request.ProxyHandler({"http": PROXY, "https": PROXY}),
-    urllib.request.HTTPSHandler(context=ctx),
-)
+_h = [urllib.request.HTTPSHandler(context=ctx)]
+if PROXY:
+    _h.insert(0, urllib.request.ProxyHandler({"http": PROXY, "https": PROXY}))
+opener = urllib.request.build_opener(*_h)
 opener.addheaders = [
     ("User-Agent", UA),
     ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"),

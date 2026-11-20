@@ -383,3 +383,28 @@
   background: linear-gradient(96deg, #ff2f63, #ff8a3d);
   color: #fff;
 }
+
+/* 付费墙 / 下载按钮（a 标签形态） */
+a.db-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.db-pw-ep {
+  font-size: 0.24rem !important;
+  color: #9a9aa1 !important;
+  margin-bottom: 0.12rem !important;
+}
+/* 顶部悬浮条的下载按钮 */
+[class*="headerAdWrap"] a[class*="openBtn"] {
+  text-decoration: none;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0 0.32rem;
+  height: 0.72rem;
+  font-size: 0.26rem;
+  font-weight: 600;
+  background: linear-gradient(96deg, #ff2f63, #ff8a3d);
+  white-space: nowrap;
+}

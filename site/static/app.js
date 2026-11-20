@@ -2,6 +2,79 @@
 (function () {
   "use strict";
   var D = document;
+  var CFG = {};
+  var APP = "DramaBox Ilimitado";
+  var DL = "/es/download/";
+  var PW = {};
+
+  function hydrateCfg() {
+    CFG = window.DBX || {};
+    APP = CFG.appName || "DramaBox Ilimitado";
+    DL = CFG.downloadUrl || "/es/download/";
+    PW = CFG.paywall || {};
+  }
+
+
+  /* ---------- 0. 品牌与下载入口（读 config.js） ---------- */
+  function applyBrand() {
+    // 正文文本节点里的 DramaBox -> App 名字（跳过脚本/样式，幂等）
+    if (APP !== "DramaBox") {
+      var walker = D.createTreeWalker(D.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (n) {
+          var p = n.parentElement;
+          if (!p) return NodeFilter.FILTER_REJECT;
+          var tag = p.tagName;
+          if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+      var node;
+      while ((node = walker.nextNode())) {
+        var v = node.nodeValue;
+        if (v && v.indexOf("DramaBox") >= 0 && v.indexOf(APP) < 0) {
+          node.nodeValue = v.replace(/DramaBox/g, APP);
+        }
+      }
+      if (D.title.indexOf("DramaBox") >= 0 && D.title.indexOf(APP) < 0) {
+        D.title = D.title.replace(/DramaBox/g, APP);
+      }
+      qsa('meta[content*="DramaBox"]').forEach(function (m) {
+        var c = m.getAttribute("content") || "";
+        if (c.indexOf(APP) < 0) m.setAttribute("content", c.replace(/DramaBox/g, APP));
+      });
+    }
+
+    // 顶部悬浮条：换文案 + 把「Abrir」变成下载入口
+    var banner = CFG.banner || {};
+    var adWrap = qs('[class*="headerAdWrap"]');
+    if (adWrap) {
+      var intro = qs('[class*="intro"]', adWrap);
+      if (intro && banner.text) intro.textContent = banner.text;
+      var btn = qs('[class*="openBtn"]', adWrap);
+      if (btn) {
+        var a = D.createElement("a");
+        a.href = DL;
+        a.className = btn.className;
+        a.textContent = banner.cta || "Descargar";
+        a.style.display = "inline-flex";
+        a.style.alignItems = "center";
+        a.style.justifyContent = "center";
+        btn.parentNode.replaceChild(a, btn);
+      }
+    }
+
+    // 下载页 / 底部「Descargar」等入口统一指向配置地址
+    qsa('[class*="EpisodeNav"] a, [class*="EpisodeNav"] div').forEach(function (el) {
+      if ((el.textContent || "").trim() === "Descargar" && !el.dataset.dbDl) {
+        el.dataset.dbDl = "1";
+        el.style.cursor = "pointer";
+        el.addEventListener("click", function (e) {
+          e.preventDefault();
+          location.href = DL;
+        });
+      }
+    });
+  }
 
   /* ---------- 1. rem 适配（还原原站 750 设计稿缩放） ---------- */
   function setRem() {
@@ -168,14 +241,14 @@
   }
 
   function lockedModal(name, ep) {
+    var title = PW.title || "Sigue viendo sin límites";
+    var body = PW.body || ("Los episodios que faltan están en la app. Descarga " + APP + " y desbloquea la serie completa: sin pagos y sin límites.");
     modal(
-      '<h3>' + (name || "Episodio " + ep) + "</h3>" +
-      "<p>Este episodio está bloqueado. Desbloquea para seguir viendo.</p>" +
-      '<button class="db-btn" data-unlock>Desbloquear episodio</button>'
+      "<h3>" + title + "</h3>" +
+      '<p class="db-pw-ep">' + (name ? name + " · " : "") + "Episodio " + ep + "</p>" +
+      "<p>" + body + "</p>" +
+      '<a class="db-btn" href="' + DL + '" data-dl>' + (PW.cta || "Descargar gratis") + "</a>"
     );
-    on(qs("[data-unlock]"), "click", function () {
-      location.href = "/es/download/";
-    });
   }
 
   function bindEpisodeList() {
@@ -190,8 +263,12 @@
         var tpl = qs('[class*="listItem"]', box);
         if (!box || !tpl) return;
         var slug = (d.bookInfo.bookNameEn || "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        // 已经渲染出来的集数（SSR 里有几集就跳过几集，避免重复）
+        var existing = qsa('[class*="listItem"]', box).filter(function (n) {
+          return !n.querySelector('[class*="viewMore"]');
+        }).length;
         (d.chapterList || []).forEach(function (c, i) {
-          if (i < 9) return;
+          if (i < existing) return;
           var node = tpl.cloneNode(true);
           var href = "/es/video/" + id + "_" + slug + "/" + c.id + "_Episode-" + (c.index + 1);
           qsa("a", node).forEach(function (a) { a.setAttribute("href", href); });
@@ -247,12 +324,14 @@
         a.classList.toggle(a.className.match(/Active/) ? "x" : "x", false);
       });
       if (!cur.unlock || !cur.mp4) {
+        var pwTitle = PW.title || "Sigue viendo sin límites";
+        var pwBody = PW.body || ("Los episodios que faltan están en la app. Descarga " + APP + " y desbloquea la serie completa: sin pagos y sin límites.");
         box.innerHTML =
           '<div class="db-lock">' +
-          '<div class="db-lock-title">Episodio ' + (cur.index + 1) + " bloqueado</div>" +
-          '<div class="db-lock-sub">Desbloquea este episodio para seguir viendo</div>' +
-          '<button class="db-btn" id="db-unlock">Desbloquear</button></div>';
-        on(qs("#db-unlock"), "click", function () { location.href = "/es/download/"; });
+          '<div class="db-lock-title">' + pwTitle + "</div>" +
+          '<div class="db-lock-sub">Episodio ' + (cur.index + 1) + " · " + pwBody + "</div>" +
+          '<a class="db-btn" href="' + DL + '">' + (PW.cta || "Descargar gratis") + "</a>" +
+          "</div>";
         return;
       }
       var v = D.createElement("video");
@@ -378,7 +457,7 @@
         el.style.cursor = "pointer";
         el.addEventListener("click", function (e) {
           e.preventDefault();
-          location.href = "/es/download/";
+          location.href = DL;
         });
       }
     });
@@ -408,6 +487,7 @@
   }
 
   function boot() {
+    applyBrand();
     buildDrawer();
     hydrateLazy();
     normalizeImages();
@@ -419,6 +499,16 @@
     bindDetailBottomNav();
     bindSearchPage();
   }
-  if (D.readyState === "loading") D.addEventListener("DOMContentLoaded", boot);
-  else boot();
+  /* 先加载 /config.js（站点配置），失败也不阻塞，用内置默认值 */
+  function start() {
+    if (window.DBX) { hydrateCfg(); return boot(); }
+    var s = D.createElement("script");
+    s.src = "/config.js";
+    s.onload = function () { hydrateCfg(); boot(); };
+    s.onerror = function () { hydrateCfg(); boot(); };
+    D.head.appendChild(s);
+  }
+
+  if (D.readyState === "loading") D.addEventListener("DOMContentLoaded", start);
+  else start();
 })();
