@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Fetch one watch page per book (first episode) — becomes the per-book player page."""
 import os, re, sys, json, glob, queue, threading, time
+import urllib.parse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from crawl import get, next_data, BASE, RAW  # noqa
 
@@ -24,7 +25,7 @@ def targets():
         slug = (bi.get("bookNameEn") or "drama")
         bslug = f"{bid}_{slug}"
         ep = f"{ch['id']}_Episode-{ch['index'] + 1}"
-        out.append((bslug, ep, f"{BASE}/es/video/{bslug}/{ep}"))
+        out.append((bslug, ep, f"{BASE}/es/video/{urllib.parse.quote(bslug, safe='_')}/{urllib.parse.quote(ep, safe='_')}"))
     return out
 
 
