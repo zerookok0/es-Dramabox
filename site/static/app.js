@@ -217,9 +217,17 @@
         list.filter(function (c) { return String(c.index + 1) === String(chapterId); })[0] || list[0];
       if (!cur) return;
       // 修正面包屑 / 标题里的集数
+      var ep = cur.index + 1;
       var crumb = qs('[class*="lastTxt"]');
-      if (crumb) crumb.textContent = "Episodio " + (cur.index + 1);
-      document.title = document.title.replace(/Episodio \d+/, "Episodio " + (cur.index + 1));
+      if (crumb) crumb.textContent = "Episodio " + ep;
+      qsa('[class*="videoTitle"], h1, [class*="videoDesc"]').forEach(function (el) {
+        if (el.children.length) return;
+        el.textContent = (el.textContent || "").replace(/Episodio \d+/, "Episodio " + ep);
+      });
+      document.title = document.title.replace(/Episodio \d+/, "Episodio " + ep);
+      qsa('[class*="linkText"]').forEach(function (a) {
+        if ((a.textContent || "").trim() === String(ep)) a.classList.add("active-ep");
+      });
       // 高亮当前集
       qsa('[class*="linkText"]').forEach(function (a) {
         a.classList.toggle(a.className.match(/Active/) ? "x" : "x", false);
