@@ -266,11 +266,28 @@
     return false;
   }
 
+
+  function showInAppBar() {
+    var g = CFG.inAppGuide || {};
+    if (g.sticky === false || qs("#db-inapp-bar")) return;
+    var bar = D.createElement("div");
+    bar.id = "db-inapp-bar";
+    bar.innerHTML = '<span class="db-ibar-ico">↑</span><span>' +
+      (g.stickyText || "Abre esta página en Chrome para descargar la app") + "</span>";
+    bar.addEventListener("click", function (e) {
+      e.preventDefault();
+      var old = qs("#db-inapp");
+      if (old) old.remove();
+      showInAppGuide();
+    });
+    D.body.insertBefore(bar, D.body.firstChild);
+    D.body.classList.add("db-ibar-on");
+  }
+
   function showInAppGuide() {
     if (qs("#db-inapp")) return;
     var g = CFG.inAppGuide || {};
-    var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent || "");
-    var steps = ios ? (g.stepsIos || []) : (g.stepsAndroid || []);
+    var steps = g.steps || g.stepsAndroid || [];
     var list = steps.map(function (t, i) {
       return '<li><span class="db-step-n">' + (i + 1) + "</span><span>" + t + "</span></li>";
     }).join("");
@@ -284,8 +301,12 @@
       '<button class="db-btn" id="db-inapp-ok">' + (g.cta || "Entendido") + "</button>" +
       "</div>";
     D.body.appendChild(w);
-    on(qs(".db-mask", w), "click", function () { w.remove(); });
-    on(qs("#db-inapp-ok", w), "click", function () { w.remove(); });
+    var done = function () {
+      w.remove();
+      showInAppBar();
+    };
+    on(qs(".db-mask", w), "click", done);
+    on(qs("#db-inapp-ok", w), "click", done);
   }
 
   /* ---------- 3. 移动端抽屉菜单 ---------- */
