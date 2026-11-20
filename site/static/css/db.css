@@ -18,47 +18,68 @@
     margin-top: 0.3rem;
   }
   [class*="listInfo"] {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 0.16rem !important;
   }
   [class*="listItem"] {
     height: auto !important;
     min-height: 0 !important;
-    padding: 0.12rem !important;
+    padding: 0 !important;
     border-radius: 0.12rem;
-    background: #f6f6f7;
-    align-items: center;
+    background: transparent !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
   }
   [class*="listItem"] [class*="imgBox"],
   [class*="listItem"] [class*="imageBox"] {
-    width: 1.05rem !important;
-    min-width: 1.05rem !important;
-    height: 1.4rem !important;
-    flex: 0 0 1.05rem;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    aspect-ratio: 3 / 4;
+    flex: none !important;
+    overflow: hidden;
+    border-radius: 0.12rem;
   }
   [class*="listItem"] img {
-    width: 1.05rem !important;
-    height: 1.4rem !important;
+    width: 100% !important;
+    height: 100% !important;
     object-fit: cover;
-    border-radius: 0.08rem;
+    border-radius: 0.12rem;
   }
   [class*="listItem"] [class*="rightIntro"] {
     min-width: 0;
-    flex: 1;
-    margin-left: 0.14rem;
+    flex: none !important;
+    display: block !important;
+    position: static !important;
+    margin: 0.08rem 0 0 0 !important;
+    padding: 0 !important;
+    text-align: center;
+    height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
   }
   [class*="listItem"] [class*="title"] {
-    font-size: 0.2rem !important;
-    line-height: 1.28 !important;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    white-space: normal !important;
+    display: none !important;
   }
   [class*="listItem"] [class*="pageNum"] {
-    font-size: 0.2rem !important;
-    color: #9a9aa1 !important;
+    display: block !important;
+    position: static !important;
+    font-size: 0.22rem !important;
+    line-height: 1.4 !important;
+    color: #17171a !important;
+    white-space: nowrap;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+  }
+  [class*="listItem"] {
+    overflow: visible !important;
   }
   [class*="episodeTitle"] {
     font-size: 0.32rem !important;
