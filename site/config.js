@@ -49,6 +49,9 @@ window.DBX = {
      只做 Android：内置浏览器下不了 APK，必须先让用户「用浏览器打开」。
      auto: 进页面就弹；sticky: 关掉弹窗后顶部留一条常驻提示 */
   inAppGuide: {
+    /* guideLanding: true 时，FB/IG 内置浏览器进来的用户直接跳 /guia/ 整屏引导页；
+       false 则留在正常页面 + 弹窗 */
+    guideLanding: false,
     auto: true,
     sticky: true,
     title: "Abre esta página en tu navegador",

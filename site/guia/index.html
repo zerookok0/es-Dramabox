@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="robots" content="noindex">
+<title>Abrir en el navegador · DramaBox Ilimitado</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; min-height: 100%;
+    font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #0f0f12; color: #fff;
+  }
+  .wrap { min-height: 100vh; display: flex; flex-direction: column; padding: 28px 22px 26px; }
+  .hero { display: flex; align-items: center; gap: 12px; }
+  .hero img { width: 54px; height: 54px; border-radius: 14px; box-shadow: 0 8px 24px rgba(255,47,99,.35); }
+  .hero .name { font-size: 19px; font-weight: 800; letter-spacing: -.01em; }
+  .hero .name em {
+    font-style: normal;
+    background: linear-gradient(96deg, #ff2f63, #ff8a3d);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .badge {
+    margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; color: #ffb199;
+    border: 1px solid rgba(255,138,61,.5); border-radius: 999px; padding: 5px 9px;
+  }
+  h1 { font-size: 25px; line-height: 1.32; margin: 26px 0 10px; letter-spacing: -.02em; }
+  .lead { font-size: 14.5px; line-height: 1.65; color: #a9a9b4; margin: 0 0 22px; }
+  .steps { list-style: none; margin: 0 0 22px; padding: 0; }
+  .steps li {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.08);
+    font-size: 14.5px; line-height: 1.55;
+  }
+  .steps li:last-child { border-bottom: 0; }
+  .n {
+    flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(96deg, #ff2f63, #ff8a3d);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; margin-top: 1px;
+  }
+  .spacer { flex: 1 1 auto; min-height: 12px; }
+  .why {
+    font-size: 13px; line-height: 1.6; color: #8b8b96; text-align: center;
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06);
+    border-radius: 14px; padding: 13px 15px; margin: 0 0 20px;
+  }
+  .cta {
+    display: block; width: 100%; border: 0; border-radius: 999px;
+    padding: 17px; font-size: 16px; font-weight: 800; color: #fff;
+    background: linear-gradient(96deg, #ff2f63, #ff8a3d);
+    box-shadow: 0 10px 30px rgba(255,47,99,.32);
+    text-align: center; text-decoration: none;
+  }
+  .ghost {
+    display: block; width: 100%; margin-top: 10px; border: 0; border-radius: 999px;
+    padding: 15px; font-size: 14.5px; font-weight: 600; color: #d3d3dc;
+    background: rgba(255,255,255,.07); text-align: center; text-decoration: none;
+  }
+  .copy { margin-top: 14px; font-size: 12.5px; color: #7c7c88; text-align: center; line-height: 1.6; }
+  .toast {
+    position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%) translateY(12px);
+    background: #fff; color: #17171a; font-size: 13px; font-weight: 700;
+    padding: 10px 18px; border-radius: 999px; opacity: 0; pointer-events: none;
+    transition: opacity .2s, transform .2s;
+  }
+  .toast.on { opacity: 1; transform: translateX(-50%); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <img src="/static/img/logo.png" alt="">
+    <div class="name">DramaBox <em>Ilimitado</em></div>
+    <div class="badge">Android</div>
+  </div>
+
+  <h1 id="g-title">Abre esta página en tu navegador</h1>
+  <p class="lead" id="g-body"></p>
+
+  <ol class="steps" id="g-steps"></ol>
+
+  <div class="spacer"></div>
+
+  <p class="why">Google Play no permite este tipo de versión, por eso la app se descarga
+  directamente desde nuestro sitio. Es la misma app, sin pagos y sin límites.</p>
+
+  <button class="cta" id="g-copy">Copiar enlace y abrir en Chrome</button>
+  <a class="ghost" href="/es/" id="g-skip">Seguir explorando</a>
+  <p class="copy">Copia el enlace, pégalo en Chrome y la descarga empezará sin avisos.</p>
+</div>
+<div class="toast" id="g-toast">Enlace copiado</div>
+
+<script src="/config.js"></script>
+<script>
+(function () {
+  var CFG = window.DBX || {};
+  var G = CFG.inAppGuide || {};
+  var APP = CFG.appName || "DramaBox Ilimitado";
+
+  document.getElementById("g-title").textContent = G.title || "Abre esta página en tu navegador";
+  document.getElementById("g-body").textContent =
+    G.body || ("Estás dentro de la app de Facebook o Instagram y desde aquí no se pueden descargar archivos. " +
+               "Abre la página en tu navegador para instalar " + APP + ".");
+
+  var steps = (G.steps && G.steps.length) ? G.steps : [
+    "Toca el menú de tres puntos (arriba a la derecha).",
+    "Elige «Abrir en el navegador» o «Abrir en Chrome».",
+    "Vuelve a pulsar Descargar en la página que se abre."
+  ];
+  document.getElementById("g-steps").innerHTML = steps.map(function (t, i) {
+    return '<li><span class="n">' + (i + 1) + "</span><span>" + t + "</span></li>";
+  }).join("");
+
+  // Pixel：PageView + 引导页曝光（复用 Facebook Pixel，若已配置）
+  var id = (CFG.fbPixelId || "").trim();
+  if (/^\d{6,}$/.test(id)) {
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return;
+      n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = [];
+      t = b.createElement(e); t.async = !0; t.src = v;
+      s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+    }(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+    fbq("init", id);
+    fbq("track", "PageView");
+  }
+
+  function toast(msg) {
+    var t = document.getElementById("g-toast");
+    t.textContent = msg || "Enlace copiado";
+    t.classList.add("on");
+    setTimeout(function () { t.classList.remove("on"); }, 1800);
+  }
+
+  document.getElementById("g-skip").addEventListener("click", function () {
+    try { sessionStorage.setItem("db_guide_skip", "1"); } catch (e) {}
+  });
+
+  document.getElementById("g-copy").addEventListener("click", function () {
+    var url = location.origin + "/es/";
+    var done = function () {
+      toast("Enlace copiado");
+      if (window.fbq) fbq("track", (CFG.fbEvents || {}).checkout || "InitiateCheckout");
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done).catch(done);
+    } else {
+      var i = document.createElement("textarea");
+      i.value = url; document.body.appendChild(i); i.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      i.remove(); done();
+    }
+  });
+})();
+</script>
+</body>
+</html>

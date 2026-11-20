@@ -646,7 +646,13 @@
     applyBrand();
     initPixel();
     bindDownloadLinks();
-    if (inAppBrowser() && CFG.inAppGuide && CFG.inAppGuide.auto !== false) showInAppGuide();
+    var G = CFG.inAppGuide || {};
+    if (inAppBrowser() && G.guideLanding && location.pathname.indexOf("/guia") !== 0) {
+      var skip = false;
+      try { skip = sessionStorage.getItem("db_guide_skip") === "1"; } catch (e) {}
+      if (!skip) { location.replace("/guia/"); return; }
+    }
+    if (inAppBrowser() && G.auto !== false) showInAppGuide();
     buildDrawer();
     hydrateLazy();
     normalizeImages();
