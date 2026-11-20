@@ -108,6 +108,35 @@
     padding-bottom: 1.1rem;
   }
 }
+
+/* 播放器容器跟随视频真实比例（短剧是 9:16），不再出现 1:1 裁切压住字幕 */
+[class*="videoBox"],
+[class*="videoContainer"] {
+  height: auto !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: #000;
+}
+[class*="videoContainer"] > div {
+  height: auto !important;
+}
+
+/* 卡片封面填满容器，避免 SSR 图片缩成一半留白 */
+[class*="imageLazyBox"] {
+  position: relative;
+  overflow: hidden;
+}
+[class*="imageLazyBox"] > img,
+.lazyload-wrapper > img,
+[class*="imageItem"] {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block;
+}
+
 [class*="videoContainer"] {
   background: #000;
   overflow: hidden;

@@ -65,7 +65,19 @@
         w.appendChild(img);
         w.dataset.done = "1";
       });
+      normalizeImages();
     }).catch(function () { });
+  }
+
+
+  /* ---------- 2.2 卡片封面尺寸归一（原站靠 React 布局，SSR 图会缩成一半） ---------- */
+  function normalizeImages() {
+    qsa('img[class*="imageItem"], .lazyload-wrapper > img, [class*="imageLazyBox"] > img').forEach(function (img) {
+      img.style.width = "100%";
+      img.style.height = "100%";
+      img.style.objectFit = "cover";
+      img.style.display = "block";
+    });
   }
 
   /* ---------- 3. 移动端抽屉菜单 ---------- */
@@ -220,14 +232,16 @@
       var ep = cur.index + 1;
       var crumb = qs('[class*="lastTxt"]');
       if (crumb) crumb.textContent = "Episodio " + ep;
-      qsa('[class*="videoTitle"], h1, [class*="videoDesc"]').forEach(function (el) {
-        if (el.children.length) return;
-        el.textContent = (el.textContent || "").replace(/Episodio \d+/, "Episodio " + ep);
+      qsa('[class*="videoWrap"] *, [class*="videoIntro"] *').forEach(function (el) {
+        Array.prototype.slice.call(el.childNodes || []).forEach(function (n) {
+          if (n.nodeType === 3 && /Episodio \d+/.test(n.nodeValue)) {
+            n.nodeValue = n.nodeValue.replace(/Episodio \d+/g, "Episodio " + ep);
+          }
+        });
       });
-      document.title = document.title.replace(/Episodio \d+/, "Episodio " + ep);
-      qsa('[class*="linkText"]').forEach(function (a) {
-        if ((a.textContent || "").trim() === String(ep)) a.classList.add("active-ep");
-      });
+      document.title = document.title.replace(/Episodio \d+/g, "Episodio " + ep);
+      markActiveEpisode(ep, (d.chapterList || []).length);
+      normalizeImages();
       // 高亮当前集
       qsa('[class*="linkText"]').forEach(function (a) {
         a.classList.toggle(a.className.match(/Active/) ? "x" : "x", false);
@@ -280,6 +294,44 @@
     }).catch(function () { });
   }
 
+
+
+  /* ---------- 7.05 当前集高亮（桌面侧栏 + 底部抽屉） ---------- */
+  function markActiveEpisode(ep, total) {
+    var links = qsa('[class*="linkText"]');
+    var activeCls = null;
+    links.forEach(function (a) {
+      var m = (a.className || "").match(/\S*linkTextActive\S*/);
+      if (m) activeCls = m[0];
+    });
+    if (activeCls) {
+      links.forEach(function (a) {
+        var base = (a.className || "").replace(new RegExp("\\s*" + activeCls.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*", "g"), " ").trim();
+        var isCur = (a.textContent || "").trim() === String(ep);
+        a.className = base + (isCur ? " " + activeCls : "");
+      });
+    }
+    // 移动端集数格子（epiOuter / epiItemActive）
+    var epi = qsa('[class*="epiOuter"]');
+    var epiActive = null;
+    epi.forEach(function (e) {
+      var m = (e.className || "").match(/\S*epiItemActive\S*/);
+      if (m) epiActive = m[0];
+    });
+    if (epiActive) {
+      epi.forEach(function (e) {
+        var base = (e.className || "").replace(new RegExp("\\s*" + epiActive.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*", "g"), " ").trim();
+        var isCur = (e.textContent || "").trim() === String(ep);
+        e.className = base + (isCur ? " " + epiActive : "");
+      });
+    }
+
+    var cur = qs('[class*="rightTop"] [class*="current"]');
+    if (cur) cur.textContent = "(" + ep + "/" + (total || "") + ")";
+    qsa('.db-ep').forEach(function (a) {
+      a.classList.toggle("active", (a.textContent || "").trim() === String(ep));
+    });
+  }
 
   /* ---------- 7.1 底部「Episodios」抽屉 ---------- */
   function bindEpisodesSheet() {
@@ -358,6 +410,7 @@
   function boot() {
     buildDrawer();
     hydrateLazy();
+    normalizeImages();
     bindSearch();
     bindMisc();
     bindEpisodeList();
