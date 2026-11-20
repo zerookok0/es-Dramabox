@@ -2,6 +2,9 @@
 
 /* ---------- 详情页移动端剧集列表 ---------- */
 @media (max-width: 768px) {
+  [class*="detailWrap"] {
+    padding-bottom: 1.15rem;
+  }
   /* 桌面侧边剧集栏在移动端隐藏（原站由 React 控制） */
   [class*="rightBox"] {
     display: none !important;
@@ -28,14 +31,14 @@
   }
   [class*="listItem"] [class*="imgBox"],
   [class*="listItem"] [class*="imageBox"] {
-    width: 1.2rem !important;
-    min-width: 1.2rem !important;
-    height: 1.6rem !important;
-    flex: 0 0 1.2rem;
+    width: 1.05rem !important;
+    min-width: 1.05rem !important;
+    height: 1.4rem !important;
+    flex: 0 0 1.05rem;
   }
   [class*="listItem"] img {
-    width: 1.2rem !important;
-    height: 1.6rem !important;
+    width: 1.05rem !important;
+    height: 1.4rem !important;
     object-fit: cover;
     border-radius: 0.08rem;
   }
@@ -45,7 +48,7 @@
     margin-left: 0.14rem;
   }
   [class*="listItem"] [class*="title"] {
-    font-size: 0.22rem !important;
+    font-size: 0.2rem !important;
     line-height: 1.28 !important;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -85,7 +88,7 @@
     width: 16px !important;
     height: 16px !important;
     min-width: 16px;
-    transform: rotate(90deg);
+    transform: none;
   }
 }
 

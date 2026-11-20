@@ -278,6 +278,34 @@
     });
   }
 
+
+  /* ---------- 7.2 详情页底部导航（Reproducir / Descargar） ---------- */
+  function bindDetailBottomNav() {
+    if (!/\/es\/drama\//.test(location.pathname)) return;
+    var nav = qs('[class*="EpisodeNav"]');
+    if (!nav) return;
+    qsa("a,div", nav).forEach(function (el) {
+      var t = (el.textContent || "").trim();
+      if (el.dataset.dbNav) return;
+      if (t === "Reproducir") {
+        el.dataset.dbNav = "1";
+        el.style.cursor = "pointer";
+        el.addEventListener("click", function (e) {
+          e.preventDefault();
+          var first = qs('a[href*="/es/video/"]');
+          if (first) location.href = first.getAttribute("href");
+        });
+      } else if (t === "Descargar") {
+        el.dataset.dbNav = "1";
+        el.style.cursor = "pointer";
+        el.addEventListener("click", function (e) {
+          e.preventDefault();
+          location.href = "/es/download/";
+        });
+      }
+    });
+  }
+
   /* ---------- 8. 搜索页 ---------- */
   function bindSearchPage() {
     var host = qs("#db-results");
@@ -309,6 +337,7 @@
     bindEpisodeList();
     bindPlayer();
     bindEpisodesSheet();
+    bindDetailBottomNav();
     bindSearchPage();
   }
   if (D.readyState === "loading") D.addEventListener("DOMContentLoaded", boot);
