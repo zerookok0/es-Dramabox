@@ -1,0 +1,37 @@
+# Cloudflare Pages headers — https://developers.cloudflare.com/pages/configuration/headers/
+# 规则自上而下匹配，Cloudflare 会取“最后一条匹配”的 Cache-Control，因此把通用规则放前面、特例放后面。
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+
+# —— HTML：始终回源校验，避免更新后用户看到旧页面
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Robots-Tag: index, follow
+
+# —— 目录页（干净 URL，无扩展名，末尾带斜杠）
+/es/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+# —— 静态资源：带 hash 的 chunk / css / 字体 / 图片，一年不可变
+/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# —— 媒体：短剧视频 / m3u8 / 分片，缓存一天（签名 URL 会过期，不能重用 immutable）
+/media/*
+  Cache-Control: public, max-age=86400
+  Accept-Ranges: bytes
+
+# —— 页面数据（Functions 会读 /data/books/<id>.json）
+/data/*
+  Cache-Control: public, max-age=300
+  Access-Control-Allow-Origin: *
+
+# —— 站内配置与安装包：不缓存
+/_headers
+  Cache-Control: public, max-age=0, must-revalidate
+/_redirects
+  Cache-Control: public, max-age=0, must-revalidate

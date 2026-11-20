@@ -1,0 +1,17 @@
+{
+  "name": "dranabox-clone",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static 1:1 mirror of dramabox.com/es + Cloudflare Pages Functions (zero dependencies)",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/serve.mjs",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true});console.log('dist removed')\""
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

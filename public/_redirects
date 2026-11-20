@@ -1,0 +1,15 @@
+# Cloudflare Pages redirects — https://developers.cloudflare.com/pages/configuration/redirects/
+# 语法：<from> <to> [status] [force]
+
+# 根域名 -> 西语站点（302 临时，方便预览，正式上线后可改 301）
+/                /es/              302
+
+# 无斜杠语言前缀 -> 带斜杠（301 永久，统一规范 URL）
+/es              /es/              301
+
+# 下载页短链
+/download        /es/download/     301
+
+# 常见入口别名
+/browse          /es/browse/       301
+/trending        /es/more/trending/ 301
