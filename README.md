@@ -164,3 +164,26 @@ window.DBX = {
 - 手动：`python tools/sync.py`（本机需要代理时 `set DB_PROXY=http://127.0.0.1:7890`）
 - 自动：`.github/workflows/sync.yml` 每天 UTC 03:00 跑一次，有变化就 commit + push，
   Cloudflare Pages 收到 push 自动重建。也可以在 Actions 页面手动点 Run workflow。
+
+## Facebook Pixel
+
+`site/config.js` 里填 Pixel ID 即可，留空则不加载（事件全部跳过）：
+
+```js
+fbPixelId: "1234567890123456",   // ← 你的 Pixel ID
+```
+
+| 触发点 | 事件 |
+|---|---|
+| 任意页面加载 | `PageView` |
+| 点「下载」（顶部条 / 付费墙 / 底部 Descargar） | `InitiateCheckout` |
+| 安全提示框里点「Descargar de todos modos」 | `Purchase` |
+
+参数统一带 `content_name: "DramaBox Ilimitado APK"`、`currency: "USD"`、`value: 0`（free 版本，方便报表区分）。
+`fbEvents` / `fbParams` 也可在 config 里改。
+
+## 第三方下载安全提示
+
+破解版不能上架 Google Play，点下载会先弹提示框（`downloadNotice` 文案在 config 里改），
+里面给三步操作说明（浏览器提示「应用有害」怎么继续、Chrome 拦截后怎么放行、未知来源安装），
+确认后再跳 `downloadUrl`。这样能显著降低「点了没反应 / 以为中毒」的流失。

@@ -93,7 +93,7 @@
         el.style.cursor = "pointer";
         el.addEventListener("click", function (e) {
           e.preventDefault();
-          location.href = DL;
+          openDownloadNotice();
         });
       }
     });
@@ -174,6 +174,85 @@
       img.style.objectFit = "cover";
       img.style.display = "block";
     });
+  }
+
+
+  /* ---------- 2.5 Facebook Pixel ---------- */
+  function initPixel() {
+    var id = (CFG.fbPixelId || "").trim();
+    if (!/^\d{6,}$/.test(id)) return;
+    /* eslint-disable */
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return;
+      n = f.fbq = function () {
+        n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+      };
+      if (!f._fbq) f._fbq = n;
+      n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = [];
+      t = b.createElement(e); t.async = !0; t.src = v;
+      s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+    }(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+    /* eslint-enable */
+    window.fbq("init", id);
+    window.fbq("track", "PageView");
+  }
+
+  function track(evtName, params) {
+    if (!window.fbq) return;
+    try {
+      window.fbq("track", evtName, params || CFG.fbParams || {});
+    } catch (e) { /* 埋点失败不影响下载 */ }
+  }
+
+  /* ---------- 2.6 第三方下载安全提示 ---------- */
+  var noticeOpen = false;
+
+  function openDownloadNotice() {
+    if (noticeOpen) return;
+    var n = CFG.downloadNotice || {};
+    var ev = (CFG.fbEvents || {});
+    // 点「下载」= 发起结账
+    track(ev.checkout || "InitiateCheckout");
+
+    var steps = (n.steps || []).map(function (t, i) {
+      return '<li><span class="db-step-n">' + (i + 1) + "</span><span>" + t + "</span></li>";
+    }).join("");
+
+    var w = modal(
+      "<h3>" + (n.title || "Antes de instalar") + "</h3>" +
+      '<p class="db-notice-lead">' + (n.lead || "") + "</p>" +
+      '<p class="db-notice-note">' + (n.note || "") + "</p>" +
+      '<ol class="db-steps">' + steps + "</ol>" +
+      '<button class="db-btn" id="db-go">' + (n.cta || "Descargar de todos modos") + "</button>" +
+      '<button class="db-btn db-ghost" id="db-stop">' + (n.secondary || "Cancelar") + "</button>"
+    );
+    noticeOpen = true;
+    var extra = qs("[data-close]", w);
+    if (extra) extra.remove(); // 已经有「Cancelar」，去掉多余按钮
+    var close = function () { noticeOpen = false; w.remove(); };
+    on(qs(".db-mask", w), "click", close);
+    on(qs("#db-stop", w), "click", close);
+    on(qs("#db-go", w), "click", function () {
+      // 确认下载 = 购买事件
+      track(ev.purchase || "Purchase");
+      window.location.href = DL;
+    });
+  }
+
+
+  /* ---------- 2.7 统一下载入口（先弹安全提示，再跳转） ---------- */
+  function bindDownloadLinks() {
+    D.addEventListener("click", function (e) {
+      var a = e.target && e.target.closest ? e.target.closest("a") : null;
+      if (!a) return;
+      if (a.closest(".db-steps") || a.id === "db-go") return;
+      var href = a.getAttribute("href") || "";
+      var isDl = a.hasAttribute("data-dl") || (DL && (href === DL || href.indexOf(DL) === 0));
+      if (!isDl) return;
+      e.preventDefault();
+      e.stopPropagation();
+      openDownloadNotice();
+    }, true);
   }
 
   /* ---------- 3. 移动端抽屉菜单 ---------- */
@@ -480,7 +559,7 @@
         el.style.cursor = "pointer";
         el.addEventListener("click", function (e) {
           e.preventDefault();
-          location.href = DL;
+          openDownloadNotice();
         });
       }
     });
@@ -511,6 +590,8 @@
 
   function boot() {
     applyBrand();
+    initPixel();
+    bindDownloadLinks();
     buildDrawer();
     hydrateLazy();
     normalizeImages();
