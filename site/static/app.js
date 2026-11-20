@@ -260,28 +260,22 @@
   /* ---------- 2.8 应用内浏览器（FB / IG / LINE 等）拦截 ---------- */
   function inAppBrowser() {
     var ua = navigator.userAgent || "";
-    if (/FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|musical_ly|Snapchat/i.test(ua)) return true;
-    // Android WebView 特征（无 "Version/x.x" 且含 wv）
-    if (/Android/i.test(ua) && /; wv\)/i.test(ua) && !/Chrome\/\d+.*Safari/i.test(ua)) return true;
+    // 1) Android WebView 的硬特征：UA 里有 "; wv)" 或 "Version/4.0"（Chrome 自带浏览器没有这两个）
+    if (/Android/i.test(ua) && (/; wv\)/i.test(ua) || /Version\/4\.0/i.test(ua))) return true;
+    // 2) 明确的国内/日韩内置浏览器
+    if (/MicroMessenger|Line\//i.test(ua)) return true;
+    // 3) FB / IG 标记 + 非标准 Chrome（Custom Tab 会带完整 Chrome 版本号，能正常下载，不算内置）
+    if (/FB_IAB|FBAN\/|FBAV\/|Instagram/i.test(ua) && !/Chrome\/\d+\.\d+\.\d+\.\d+/i.test(ua)) return true;
     return false;
   }
 
-
-  function showInAppBar() {
-    var g = CFG.inAppGuide || {};
-    if (g.sticky === false || qs("#db-inapp-bar")) return;
-    var bar = D.createElement("div");
-    bar.id = "db-inapp-bar";
-    bar.innerHTML = '<span class="db-ibar-ico">↑</span><span>' +
-      (g.stickyText || "Abre esta página en Chrome para descargar la app") + "</span>";
-    bar.addEventListener("click", function (e) {
-      e.preventDefault();
-      var old = qs("#db-inapp");
-      if (old) old.remove();
-      showInAppGuide();
-    });
-    D.body.insertBefore(bar, D.body.firstChild);
-    D.body.classList.add("db-ibar-on");
+  /* 自检：链接后加 ?dbg=1 会显示判定结果和 UA，方便在真机上确认 */
+  function debugInApp() {
+    if (!/[?&]dbg=1/.test(location.search)) return;
+    var d = D.createElement("div");
+    d.style.cssText = "position:fixed;left:8px;right:8px;bottom:8px;z-index:99999;background:#000;color:#0f0;font:11px/1.4 monospace;padding:8px;border-radius:8px;word-break:break-all";
+    d.textContent = "inApp=" + inAppBrowser() + "\n" + navigator.userAgent;
+    D.body.appendChild(d);
   }
 
   function showInAppGuide() {
@@ -646,6 +640,7 @@
     applyBrand();
     initPixel();
     bindDownloadLinks();
+    debugInApp();
     var G = CFG.inAppGuide || {};
     if (inAppBrowser() && G.guideLanding && location.pathname.indexOf("/guia") !== 0) {
       var skip = false;
