@@ -408,3 +408,30 @@ a.db-btn {
   background: linear-gradient(96deg, #ff2f63, #ff8a3d);
   white-space: nowrap;
 }
+
+/* 文字字标（替代 m-logo.png 位图） */
+.db-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.08em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #17171a;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.db-wordmark em {
+  font-style: normal;
+  background: linear-gradient(96deg, #ff2f63, #ff8a3d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.db-wordmark .db-wm-ico {
+  width: 0.9em;
+  height: 0.9em;
+  border-radius: 0.24em;
+  margin-right: 0.18em;
+  object-fit: contain;
+}

@@ -6,6 +6,9 @@ window.DBX = {
   /* App 名字（西语）。全站正文、标题、meta 里的 "DramaBox" 都会替换成它 */
   appName: "DramaBox Ilimitado",
 
+  /* 头部/页脚的字标：true=用文字渲染 "DramaBox Ilimitado"，false=保留原站 m-logo.png 位图 */
+  wordmarkText: true,
+
   /* 下载地址：APK / Play 商店 / 落地页都行，点击所有下载按钮都会跳这里 */
   downloadUrl: "https://www.dramabox.com/es/download/",
 

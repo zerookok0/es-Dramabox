@@ -63,6 +63,29 @@
       }
     }
 
+    // 字标：原站是 m-logo.png（横排 "DramaBox"），换成可配置的文字字标
+    if (CFG.wordmarkText !== false) {
+      qsa('img[class*="logoIcon"], img[class*="logoBox"]').forEach(function (img) {
+        var box = img.getBoundingClientRect();
+        var h = box.height || (img.getAttribute("height") || 21) * 1;
+        var span = D.createElement("span");
+        span.className = "db-wordmark";
+        span.setAttribute("aria-label", APP);
+        var html = APP.replace(/(\S+)\s+(.+)$/, function (m, a, b) {
+          return a + " <em>" + b + "</em>";
+        });
+        // PC 头部字标：保留原 app 图标，再接文字
+        if (/logoIcon/.test(img.className)) {
+          html = '<img class="db-wm-ico" src="/static/img/logo.png" alt="">' + html;
+        }
+        span.innerHTML = html;
+        span.style.height = Math.max(18, h) + "px";
+        span.style.lineHeight = Math.max(18, h) + "px";
+        span.style.fontSize = Math.max(15, Math.round(h * 0.78)) + "px";
+        img.replaceWith(span);
+      });
+    }
+
     // 下载页 / 底部「Descargar」等入口统一指向配置地址
     qsa('[class*="EpisodeNav"] a, [class*="EpisodeNav"] div').forEach(function (el) {
       if ((el.textContent || "").trim() === "Descargar" && !el.dataset.dbDl) {
