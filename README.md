@@ -187,3 +187,14 @@ fbPixelId: "1234567890123456",   // ← 你的 Pixel ID
 破解版不能上架 Google Play，点下载会先弹提示框（`downloadNotice` 文案在 config 里改），
 里面给三步操作说明（浏览器提示「应用有害」怎么继续、Chrome 拦截后怎么放行、未知来源安装），
 确认后再跳 `downloadUrl`。这样能显著降低「点了没反应 / 以为中毒」的流失。
+
+
+## 应用内浏览器（FB / IG 广告点击）处理
+
+Facebook / Instagram 的内置浏览器**无法下载 APK**（WebView 会拦掉二进制下载），
+所以检测到 `FBAN|FBAV|Instagram|Line/|MicroMessenger|wv` 等 UA 时，页面会弹
+「Abre esta página en tu navegador」三步引导（Android 版本用三点菜单，iOS 版本用分享按钮），
+`site/config.js` 的 `inAppGuide` 控制文案和是否自动弹（`auto: false` 只在点下载时弹）。
+
+Pixel 在应用内浏览器里照样回传 `PageView` / `InitiateCheckout`；
+只有跳到外部浏览器、真正点「Descargar de todos modos」才会回传 `Purchase`。

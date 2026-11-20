@@ -209,6 +209,7 @@
 
   function openDownloadNotice() {
     if (noticeOpen) return;
+    if (inAppBrowser()) { showInAppGuide(); return; }
     var n = CFG.downloadNotice || {};
     var ev = (CFG.fbEvents || {});
     // 点「下载」= 发起结账
@@ -253,6 +254,38 @@
       e.stopPropagation();
       openDownloadNotice();
     }, true);
+  }
+
+
+  /* ---------- 2.8 应用内浏览器（FB / IG / LINE 等）拦截 ---------- */
+  function inAppBrowser() {
+    var ua = navigator.userAgent || "";
+    if (/FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|Twitter|musical_ly|Snapchat/i.test(ua)) return true;
+    // Android WebView 特征（无 "Version/x.x" 且含 wv）
+    if (/Android/i.test(ua) && /; wv\)/i.test(ua) && !/Chrome\/\d+.*Safari/i.test(ua)) return true;
+    return false;
+  }
+
+  function showInAppGuide() {
+    if (qs("#db-inapp")) return;
+    var g = CFG.inAppGuide || {};
+    var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+    var steps = ios ? (g.stepsIos || []) : (g.stepsAndroid || []);
+    var list = steps.map(function (t, i) {
+      return '<li><span class="db-step-n">' + (i + 1) + "</span><span>" + t + "</span></li>";
+    }).join("");
+    var w = D.createElement("div");
+    w.id = "db-inapp";
+    w.innerHTML =
+      '<div class="db-mask"></div><div class="db-sheet db-inapp-sheet">' +
+      "<h3>" + (g.title || "Abre esta página en tu navegador") + "</h3>" +
+      '<p class="db-notice-lead">' + (g.body || "") + "</p>" +
+      '<ol class="db-steps">' + list + "</ol>" +
+      '<button class="db-btn" id="db-inapp-ok">' + (g.cta || "Entendido") + "</button>" +
+      "</div>";
+    D.body.appendChild(w);
+    on(qs(".db-mask", w), "click", function () { w.remove(); });
+    on(qs("#db-inapp-ok", w), "click", function () { w.remove(); });
   }
 
   /* ---------- 3. 移动端抽屉菜单 ---------- */
@@ -592,6 +625,7 @@
     applyBrand();
     initPixel();
     bindDownloadLinks();
+    if (inAppBrowser() && CFG.inAppGuide && CFG.inAppGuide.auto !== false) showInAppGuide();
     buildDrawer();
     hydrateLazy();
     normalizeImages();

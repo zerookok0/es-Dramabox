@@ -44,6 +44,30 @@ window.DBX = {
     secondary: "Ya tengo la app"
   },
 
+
+  /* 应用内浏览器（Facebook / Instagram / LINE 等）里打开时的引导层。
+     FB 内置浏览器无法直接下载 APK，必须先让用户「用浏览器打开」。
+     auto:false 可关闭自动弹出（只在下点下载时弹） */
+  inAppGuide: {
+    auto: true,
+    title: "Abre esta página en tu navegador",
+    body:
+      "Estás dentro de la app de Facebook o Instagram y desde aquí no se " +
+      "pueden descargar archivos. Abre la página en tu navegador para instalar " +
+      "DramaBox Ilimitado.",
+    stepsAndroid: [
+      "Toca el menú de tres puntos (arriba a la derecha).",
+      "Elige «Abrir en el navegador» o «Abrir en Chrome».",
+      "Vuelve a pulsar Descargar en la página que se abre."
+    ],
+    stepsIos: [
+      "Toca el botón de compartir (abajo o arriba a la derecha).",
+      "Elige «Abrir en Safari».",
+      "Vuelve a pulsar Descargar en la página que se abre."
+    ],
+    cta: "Entendido"
+  },
+
   /* 破解版第三方下载的安全提示（点下载先弹这个，再跳 downloadUrl） */
   downloadNotice: {
     title: "Antes de instalar",

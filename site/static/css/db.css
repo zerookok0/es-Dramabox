@@ -498,3 +498,45 @@ a.db-btn {
   padding: 14px 18px;
   font-size: 15px;
 }
+
+/* 应用内浏览器引导层 */
+#db-inapp {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#db-inapp .db-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+.db-inapp-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 18px 18px 0 0;
+  padding: 22px 20px 28px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+.db-inapp-sheet h3 {
+  font-size: 17px;
+  margin: 0 0 10px;
+  text-align: center;
+}
+.db-inapp-sheet .db-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+  font-size: 15px;
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(96deg, #ff2f63, #ff8a3d);
+}

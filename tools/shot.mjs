@@ -50,7 +50,8 @@ async function main() {
     width: +w, height: +h, deviceScaleFactor: 2, mobile: true,
   });
   await send("Emulation.setUserAgentOverride", {
-    userAgent: "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
+    userAgent: process.env.UA ||
+      "Mozilla/5.0 (Linux; Android 13; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
   });
   await send("Page.navigate", { url });
   await sleep(3500);
