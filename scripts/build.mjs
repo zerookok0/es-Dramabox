@@ -141,9 +141,11 @@ async function main() {
     console.warn('[build] warn: 没有 public\\ 目录，跳过 _headers/_redirects 等根级文件。');
   }
 
-  // 5) data/ -> dist/data（Pages Function 校验 /es/video/... 时需要读 /data/books/<id>.json）
-  if (await exists(DATA)) {
+  // 5) data/ -> dist/data（site/data 已由镜像产出时跳过，避免重复与体积翻倍）
+  if (await exists(DATA) && !(await exists(path.join(SITE, 'data')))) {
     await copyTree(DATA, path.join(DIST, 'data'), 'data');
+  } else if (await exists(path.join(SITE, 'data'))) {
+    console.log('[build] site/data 已就绪，跳过根 data/ 复制');
   } else {
     console.warn('[build] warn: 没有 data\\ 目录，Functions 的书籍校验将只能走 302 兜底。');
   }

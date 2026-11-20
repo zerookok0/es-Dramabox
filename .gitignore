@@ -4,3 +4,5 @@ raw/
 .wrangler/
 *.log
 .DS_Store
+data/
+.shots/

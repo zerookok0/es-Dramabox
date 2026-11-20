@@ -202,16 +202,17 @@ export async function onRequestGet(context) {
     );
   }
 
-  // e. 校验通过：把请求原样透传给同源静态资源（镜像好的播放页 /es/video/...）。
-  //    TODO 扩展点：这里可以改为渲染播放器、注入签名播放地址、加防盗链 token 等。
+  // e. 校验通过：交付该剧的静态播放页（每部剧镜像一份 /es/video/<bookSlug>/index.html）。
+  //    页面内 app.js 会从 location 里解析 chapterId，选中对应剧集并加载 mp4，
+  //    因此任意 /季/集 的 URL 都由这一份页面承接，不需要为每集生成静态文件。
   try {
-    const assetUrl = new URL(request.url);
+    const pagePath = `/es/video/${encodeURIComponent(bookSlug)}/`;
+    const assetUrl = new URL(pagePath, request.url);
     const res = env && env.ASSETS && typeof env.ASSETS.fetch === 'function'
       ? await env.ASSETS.fetch(new Request(assetUrl.toString(), { method: 'GET' }))
       : await fetch(assetUrl.toString(), { method: 'GET' });
 
     if (res && res.ok) {
-      // 透传时补上鉴权通过的标记，方便排查；同时避免边缘缓存串号
       const headers = new Headers(res.headers);
       headers.set('X-Dranabox-Route', 'video-verify');
       headers.set('Cache-Control', 'public, max-age=0, must-revalidate');

@@ -82,4 +82,13 @@ async function main() {
     clip = { x: 0, y: 0, width: +w, height: Math.min(m.scrollH || +h, 4000), scale: 1 };
   }
   const shot = await send("Page.captureScreenshot", {
-    format: "png", captureBeyon
+    format: "png", captureBeyondViewport: !!full, ...(clip ? { clip } : {}),
+  });
+  fs.mkdirSync(path.dirname(out), { recursive: true });
+  fs.writeFileSync(out, Buffer.from(shot.result.data, "base64"));
+  console.log("shot:", out);
+  ws.close();
+}
+
+main().catch((e) => { console.error(e); process.exitCode = 1; })
+  .finally(() => { try { proc.kill(); } catch {} });

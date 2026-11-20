@@ -103,6 +103,15 @@ async function statFile(p) {
 
 /** URL path -> 磁盘文件（含干净 URL / index.html / .html 回落） */
 async function resolveTarget(rootDir, urlPath) {
+  // 播放页：/es/video/<bookSlug>/<epSlug> 统一由 /es/video/<bookSlug>/index.html 承接
+  // （生产环境由 functions/es/video/[[path]].js 做同样的映射）
+  const vm = urlPath.match(/^\/es\/video\/([^/]+)\/[^/]+\/?$/);
+  if (vm) {
+    const idx = path.join(rootDir, 'es', 'video', decodeURIComponent(vm[1]), 'index.html');
+    const st = await statFile(idx);
+    if (st) return { file: idx, stat: st, status: 200 };
+  }
+
   // 规范化：去掉 .. 防止目录穿越
   const safe = path.posix.normalize(urlPath).replace(/^(\.\.[/\\])+/, '');
   const rel = safe.replace(/^\/+/, '');

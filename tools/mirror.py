@@ -137,15 +137,16 @@ def rewrite_html(s: str) -> str:
         s = re.sub(r'https?://' + re.escape(k) + r'\?[^"\']*', v, s)
         s = re.sub(r'https?://' + re.escape(k), v, s)
     # cdn chrome assets -> local
-    s = s.replace("https://infocdn.dramaboxdb.com/seo/dramabox/images/", "/static/img/")
-    s = s.replace("http://infocdn.dramaboxdb.com/seo/dramabox/images/", "/static/img/")
+    s = re.sub(r'https?://infocdn\.dramaboxdb\.com/seo/dramabox/images/([\w./\-]+\.(?:png|jpe?g|webp|gif|svg|ico))',
+               r'/static/img/\1', s)
     # absolute internal links -> relative
     s = s.replace('href="https://www.dramabox.com', 'href="')
     s = s.replace('href="http://www.dramabox.com', 'href="')
     s = re.sub(r'href="(/(?!static/|terms\.html|privacy\.html|cookie\.html)[^"#?]*?)"',
                lambda m: f'href="{m.group(1)}/"' if not m.group(1).endswith(".html") else m.group(0), s)
     # inject our stylesheet + runtime
-    head_add = '<link rel="stylesheet" href="/static/css/app.css"/>'
+    head_add = ('<link rel="stylesheet" href="/static/css/app.css"/>'
+                '<link rel="stylesheet" href="/static/css/db.css"/>')
     s = s.replace("</head>", head_add + "</head>", 1)
     if "/static/app.js" not in s:
         s = s.replace("</body>", '<script src="/static/app.js" defer></script></body>', 1)
@@ -220,11 +221,26 @@ def build_data():
     print(f"data books: {n}")
 
 
+def build_assets():
+    """Download every /static/img/... referenced by mirrored pages."""
+    refs = set()
+    for f in glob.glob(os.path.join(SITE, "**", "*.html"), recursive=True):
+        s = open(f, encoding="utf-8", errors="replace").read()
+        refs.update(re.findall(r'/static/img/([\w./\-]+\.(?:png|jpe?g|webp|gif|svg|ico))', s))
+    missing = [r for r in sorted(refs) if not os.path.exists(os.path.join(STATIC, "img", r))]
+    print(f"assets: refs={len(refs)} missing={len(missing)}")
+    for r in missing:
+        url = "https://infocdn.dramaboxdb.com/seo/dramabox/images/" + r
+        dl(url, os.path.join(STATIC, "img", r))
+
+
 if __name__ == "__main__":
-    steps = sys.argv[1:] or ["css", "chrome", "pages"]
+    steps = sys.argv[1:] or ["css", "chrome", "pages", "assets"]
     if "css" in steps:
         build_css()
     if "chrome" in steps:
         build_chrome()
     if "pages" in steps:
         build_pages()
+    if "assets" in steps:
+        build_assets()

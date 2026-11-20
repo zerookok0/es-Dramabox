@@ -1,0 +1,332 @@
+/* 复刻版补充样式：补齐原站由 React 在移动端渲染、SSR 里被 display:none 的区块 */
+
+/* ---------- 详情页移动端剧集列表 ---------- */
+@media (max-width: 768px) {
+  /* 桌面侧边剧集栏在移动端隐藏（原站由 React 控制） */
+  [class*="rightBox"] {
+    display: none !important;
+  }
+  /* 原站移动端的「Lista de Episodios >」入口行，已用下方内联列表替代 */
+  [class*="catalogBox"] {
+    display: none !important;
+  }
+  [class*="episodeListBox"] {
+    display: flex !important;
+    margin-top: 0.3rem;
+  }
+  [class*="listInfo"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.16rem !important;
+  }
+  [class*="listItem"] {
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0.12rem !important;
+    border-radius: 0.12rem;
+    background: #f6f6f7;
+    align-items: center;
+  }
+  [class*="listItem"] [class*="imgBox"],
+  [class*="listItem"] [class*="imageBox"] {
+    width: 1.2rem !important;
+    min-width: 1.2rem !important;
+    height: 1.6rem !important;
+    flex: 0 0 1.2rem;
+  }
+  [class*="listItem"] img {
+    width: 1.2rem !important;
+    height: 1.6rem !important;
+    object-fit: cover;
+    border-radius: 0.08rem;
+  }
+  [class*="listItem"] [class*="rightIntro"] {
+    min-width: 0;
+    flex: 1;
+    margin-left: 0.14rem;
+  }
+  [class*="listItem"] [class*="title"] {
+    font-size: 0.22rem !important;
+    line-height: 1.28 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal !important;
+  }
+  [class*="listItem"] [class*="pageNum"] {
+    font-size: 0.2rem !important;
+    color: #9a9aa1 !important;
+  }
+  [class*="episodeTitle"] {
+    font-size: 0.32rem !important;
+    font-weight: 600;
+  }
+  [class*="allCounts"] {
+    font-size: 0.24rem !important;
+    color: #9a9aa1;
+  }
+  [class*="viewMore"] {
+    grid-column: 1 / -1;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.08rem;
+    background: #fff !important;
+    border: 1px solid #ececf0;
+    padding: 0.2rem 0 !important;
+  }
+  [class*="viewMore"] span {
+    font-size: 0.26rem !important;
+    color: #17171a;
+  }
+  [class*="viewMore"] img,
+  [class*="moreIcon"] {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px;
+    transform: rotate(90deg);
+  }
+}
+
+
+/* ---------- 播放页 ---------- */
+.db-video {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 78vh;
+  display: block;
+  background: #000;
+  object-fit: contain;
+}
+@media (max-width: 768px) {
+  [class*="videoBottom"],
+  [class*="videoWrap"] {
+    padding-bottom: 1.1rem;
+  }
+}
+[class*="videoContainer"] {
+  background: #000;
+  overflow: hidden;
+}
+.db-lock {
+  aspect-ratio: 16 / 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.12rem;
+  background: #101013;
+  color: #fff;
+  text-align: center;
+  padding: 0 0.4rem;
+}
+.db-lock-title {
+  font-size: 0.34rem;
+  font-weight: 600;
+}
+.db-lock-sub {
+  font-size: 0.24rem;
+  color: #a9a9b2;
+}
+.db-btn {
+  margin-top: 0.16rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.2rem 0.48rem;
+  font-size: 0.28rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(96deg, #ff2f63, #ff8a3d);
+  cursor: pointer;
+}
+.db-btn.db-ghost {
+  background: #2a2a30;
+  color: #e6e6ea;
+}
+
+/* ---------- 抽屉菜单 ---------- */
+#db-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  visibility: hidden;
+  pointer-events: none;
+}
+#db-drawer.open {
+  visibility: visible;
+  pointer-events: auto;
+}
+#db-drawer .db-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+#db-drawer.open .db-mask {
+  opacity: 1;
+}
+#db-drawer .db-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 68%;
+  max-width: 300px;
+  background: #fff;
+  transform: translateX(-100%);
+  transition: transform 0.24s ease;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: inherit;
+}
+#db-drawer.open .db-panel {
+  transform: none;
+}
+#db-drawer .db-brand {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ff2f63;
+  margin-bottom: 14px;
+}
+#db-drawer a {
+  color: #17171a;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid #f0f0f2;
+}
+#db-drawer .db-legal {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+}
+#db-drawer .db-legal a {
+  font-size: 14px;
+  color: #6b6b74;
+  border-bottom: 0;
+  padding: 8px 0;
+}
+
+/* ---------- 弹窗 ---------- */
+#db-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+#db-modal .db-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+#db-modal .db-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 18px 18px 0 0;
+  padding: 22px 20px 28px;
+  text-align: center;
+}
+#db-modal h3 {
+  font-size: 17px;
+  margin: 0 0 8px;
+}
+#db-modal p {
+  font-size: 14px;
+  color: #6b6b74;
+  margin: 0 0 6px;
+  line-height: 1.6;
+}
+
+/* ---------- 搜索页 ---------- */
+.db-search-wrap {
+  padding: 0.9rem 16px 40px;
+  min-height: 60vh;
+}
+.db-search-wrap h1 {
+  font-size: 20px;
+  margin: 4px 0 14px;
+}
+.db-search-input {
+  width: 100%;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid #e6e6ea;
+  padding: 0 18px;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+}
+.db-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+.db-card {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.db-card img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #eee;
+}
+.db-card-t {
+  font-size: 13px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.db-card-s {
+  font-size: 11px;
+  color: #9a9aa1;
+}
+.db-empty {
+  color: #9a9aa1;
+  font-size: 14px;
+  margin-top: 20px;
+}
+
+/* 剧集抽屉 */
+.db-eps {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  max-height: 46vh;
+  overflow: auto;
+  margin: 12px 0 6px;
+}
+.db-ep {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  border-radius: 8px;
+  background: #f3f3f5;
+  color: #17171a;
+  font-size: 13px;
+  text-decoration: none;
+}
+.db-ep.locked {
+  color: #a0a0a8;
+  background: #f7f7f9;
+}
+.db-ep.active {
+  background: linear-gradient(96deg, #ff2f63, #ff8a3d);
+  color: #fff;
+}
