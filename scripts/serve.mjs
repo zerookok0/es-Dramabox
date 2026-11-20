@@ -247,6 +247,30 @@ const server = http.createServer(async (req, res) => {
       return res.end();
     }
 
+    // 0.5) 视频端点：/video/<bookId>/<chapterId>.mp4 -> 302 到原站签名直链
+    //      与生产环境的 functions/video/[[path]].js 行为保持一致
+    const vm = urlPath.match(/^\/video\/(\d+)\/(\d+)\.mp4$/);
+    if (vm) {
+      const [, bid, cid] = vm;
+      let mp4 = null;
+      for (const root of [DOCROOT, SITE]) {
+        try {
+          const raw = await fs.readFile(path.join(root, 'data', 'books', `${bid}.json`), 'utf8');
+          const book = JSON.parse(raw);
+          const list = book.chapterList || [];
+          const ch = list.find((c) => String(c.id) === cid) ||
+            list.find((c) => String(c.index + 1) === cid);
+          if (ch && ch.mp4) { mp4 = ch.mp4; break; }
+        } catch { /* try next root */ }
+      }
+      if (!mp4) {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
+        return res.end('video no disponible');
+      }
+      res.writeHead(302, { Location: mp4, 'Cache-Control': 'private, max-age=0, no-store' });
+      return res.end();
+    }
+
     let hit = await resolveTarget(DOCROOT, urlPath);
 
     // dist 没建好时，同一条路径去 site/ 再找一次（no build 直接预览）

@@ -242,7 +242,17 @@
         return;
       }
       var v = D.createElement("video");
-      v.src = cur.mp4;
+      // 走同源 /video/<bookId>/<chapterId>.mp4：由 Pages Function 校验签名、必要时回源重签
+      // （原站直链只有 24 小时有效期，直接热链会隔天失效）
+      v.src = "/video/" + bookId + "/" + cur.id + ".mp4";
+      var triedDirect = false;
+      v.addEventListener("error", function () {
+        if (triedDirect || !cur.mp4) return;
+        triedDirect = true;
+        v.src = cur.mp4; // 兜底：直连原站签名地址
+        v.load();
+        v.play().catch(function () { });
+      });
       v.controls = true;
       v.autoplay = true;
       v.playsInline = true;
@@ -252,6 +262,14 @@
       v.poster = cur.cover || "";
       v.className = "db-video";
       box.appendChild(v);
+      // 自动播放：先尝试带声音，被浏览器拦截则静音播放（用户可点开音量）
+      var p = v.play();
+      if (p && p.catch) {
+        p.catch(function () {
+          v.muted = true;
+          v.play().catch(function () { });
+        });
+      }
       // 播放结束后自动下一集
       v.addEventListener("ended", function () {
         var next = list[cur.index + 1];

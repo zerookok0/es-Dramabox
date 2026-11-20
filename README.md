@@ -122,3 +122,22 @@ npx wrangler pages dev dist --compatibility-date=2025-01-01
 ## 入库约定
 
 `raw/`、`dist/`、`node_modules/`、`.wrangler/`、`*.log`、`.DS_Store` 已被 `.gitignore` 排除。提交前只在 `site/`、`data/`、`public/`、`functions/`、`scripts/` 上产生 diff。
+
+## 视频链路（重要）
+
+原站每集 mp4 是 CloudFront 签名直链，**签名 24 小时过期**，不能长期热链。
+
+播放器统一走同源端点：
+
+```
+/video/<bookId>/<chapterId>.mp4
+  ├─ Pages Function: functions/video/[[path]].js
+  ├─ 读 /data/books/<bookId>.json 拿当前地址
+  ├─ 距过期 < 6h 时回源 www.dramabox.com 重签（结果进 Cache API 6h）
+  └─ 302 到可播放的签名直链
+```
+
+本地 `npm run dev` 由 `scripts/serve.mjs` 做同样的 302（不重签，用于预览）。
+
+免费集数：99,399 集中 15,654 集（15.7%）带 mp4，其余为原站付费集，复刻版保持同样的付费墙。
+批量刷新签名：`python tools/refresh_urls.py`（可选，端点已能按需重签）。
