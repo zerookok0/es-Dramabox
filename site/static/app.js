@@ -209,8 +209,11 @@
 
   function openDownloadNotice() {
     if (noticeOpen) return;
-    // 应用内浏览器（WebView）下不了 APK，只能提示换浏览器
-    if (inAppBrowser()) { showInAppGuide(); return; }
+    // 应用内引导：默认关闭（onDownload:false），WebView 里也直接跳转
+    if (inAppBrowser() && (CFG.inAppGuide || {}).onDownload !== false) {
+      showInAppGuide();
+      return;
+    }
 
     var n = CFG.downloadNotice || {};
     var ev = (CFG.fbEvents || {});

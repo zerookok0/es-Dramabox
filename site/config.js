@@ -52,8 +52,9 @@ window.DBX = {
     /* guideLanding: true 时，FB/IG 内置浏览器进来的用户直接跳 /guia/ 整屏引导页；
        false 则留在正常页面 + 弹窗 */
     guideLanding: false,
-    auto: false,     // false = 进页面不弹（只在应用内浏览器点下载时才提示）
-    sticky: false,   // false = 不留顶部常驻条
+    auto: false,      // 进页面不弹
+    sticky: false,    // 不留顶部常驻条
+    onDownload: false, // 应用内浏览器点下载也不提示，直接跳下载地址
     title: "Abre esta página en tu navegador",
     body:
       "Estás dentro de la app de Facebook o Instagram y desde aquí no se " +
