@@ -12,12 +12,12 @@ window.DBX = {
 
   /* 下载地址：APK 直链 / 网盘 / 落地页都行。
      注意这是第三方（非 Google Play）下载，点击后先弹安全提示，再跳这里 */
-  downloadUrl: "https://www.dramabox.com/es/download/",
+  downloadUrl: "https://petchillhk.shop/s/JSep8wFOX9zvshuQ/dl",
 
   /* ---------- Facebook Pixel ---------- */
   /* 填你的 Pixel ID（纯数字，例如 "1234567890123456"）。
      留空 = 不加载 Pixel，事件全部跳过。 */
-  fbPixelId: "",
+  fbPixelId: "1524903026360731",
 
   /* 事件名：标准事件，广告后台直接可用的就是这两个 */
   fbEvents: {
