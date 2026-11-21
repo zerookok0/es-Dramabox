@@ -209,9 +209,20 @@
 
   function openDownloadNotice() {
     if (noticeOpen) return;
+    // 应用内浏览器（WebView）下不了 APK，只能提示换浏览器
     if (inAppBrowser()) { showInAppGuide(); return; }
+
     var n = CFG.downloadNotice || {};
     var ev = (CFG.fbEvents || {});
+
+    // 关掉安全提示：点下载 = 直接进下载页，同时回传两个事件
+    if (n.enabled === false) {
+      track(ev.checkout || "InitiateCheckout");
+      track(ev.purchase || "Purchase");
+      window.location.href = DL;
+      return;
+    }
+
     // 点「下载」= 发起结账
     track(ev.checkout || "InitiateCheckout");
 
@@ -297,7 +308,7 @@
     D.body.appendChild(w);
     var done = function () {
       w.remove();
-      showInAppBar();
+      if ((CFG.inAppGuide || {}).sticky !== false) showInAppBar();
     };
     on(qs(".db-mask", w), "click", done);
     on(qs("#db-inapp-ok", w), "click", done);
@@ -647,7 +658,7 @@
       try { skip = sessionStorage.getItem("db_guide_skip") === "1"; } catch (e) {}
       if (!skip) { location.replace("/guia/"); return; }
     }
-    if (inAppBrowser() && G.auto !== false) showInAppGuide();
+    if (inAppBrowser() && G.auto === true) showInAppGuide();
     buildDrawer();
     hydrateLazy();
     normalizeImages();

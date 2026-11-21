@@ -52,8 +52,8 @@ window.DBX = {
     /* guideLanding: true 时，FB/IG 内置浏览器进来的用户直接跳 /guia/ 整屏引导页；
        false 则留在正常页面 + 弹窗 */
     guideLanding: false,
-    auto: true,
-    sticky: true,
+    auto: false,     // false = 进页面不弹（只在应用内浏览器点下载时才提示）
+    sticky: false,   // false = 不留顶部常驻条
     title: "Abre esta página en tu navegador",
     body:
       "Estás dentro de la app de Facebook o Instagram y desde aquí no se " +
@@ -70,6 +70,7 @@ window.DBX = {
 
   /* 破解版第三方下载的安全提示（点下载先弹这个，再跳 downloadUrl） */
   downloadNotice: {
+    enabled: false,  // false = 点下载直接跳 downloadUrl，不弹「有害应用」提示
     title: "Antes de instalar",
     lead:
       "Esta es la versión ilimitada de DramaBox y se distribuye directamente " +
